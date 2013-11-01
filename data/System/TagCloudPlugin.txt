@@ -1,4 +1,5 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1335351111" format="1.1" reprev="2" version="2"}%
+%META:TOPICINFO{author="BaseUserMapping_999" comment="autosave" date="1356278780" format="1.1" version="3"}%
+
 ---+!! <nop>%TOPIC%
 %TOC%
 %STARTSECTION{"exampletext"}%
@@ -178,11 +179,15 @@ Cloud for the above text:
 -->
 
 |  Plugin Author: | Michael Daum |
-|  Copyright &copy;: | 2006-2009, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2006-2013, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | &nbsp; |
+|  01 Nov 2013: | preserve sorting order of terms; \
+                  fixed normalization to respect the =min= parameter; \
+                  =min= defaults to 1 now; \
+                  fixed unicode support |
 |  10 Dec 2009: | added logarithmic normalization (Foswiki:Main/DanielOderbolz) |
 |  25 Nov 2009: | fixed grouping in case sensitive tag clouds |
 |  03 Sep 2009: | made sorting case insensitive; added case sensitive extra param |

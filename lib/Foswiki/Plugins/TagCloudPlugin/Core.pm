@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2009 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2013 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@
 package Foswiki::Plugins::TagCloudPlugin::Core;
 
 use strict;
+use warnings;
 
 use constant DEBUG => 0; # toggle me
 
@@ -396,7 +397,7 @@ sub handleTagCloud {
 
   # fix params
   $theMin =~ s/[^\d]//go;
-  $theMin = 0 unless $theMin;
+  $theMin = 1 unless defined $theMin;
   $theBuckets =~ s/[^\d]//go;
   $theBuckets = 10 if !$theBuckets || $theBuckets < 2;
   $theOffset =~ s/[^\d]//go;
@@ -427,7 +428,6 @@ sub handleTagCloud {
   }
 
   # generate term list
-
   if (expandVariables($theTerms)) {
     #writeDebug("initially theTerms=$theTerms\n");
     $theTerms = Foswiki::Func::expandCommonVariables($theTerms, $theTopic, $theWeb);
@@ -461,6 +461,7 @@ sub handleTagCloud {
   $stopWords = getStopWords($theLanguage) 
     if $theStopWords eq 'on';
 
+  my @terms = ();
   foreach my $term (split(/$theSplit/, $theTerms)) {
     $term =~ s/^\s*(.*?)\s*$/$1/o;
     #writeDebug("term=$term");
@@ -485,7 +486,7 @@ sub handleTagCloud {
     next if $theInclude && $term !~ /^($theInclude)$/;
 
     # SMELL order matters
-    $term = &singularForm($term) if $thePlural eq 'off';
+    $term = singularForm($term) if $thePlural eq 'off';
 
     # apply term map
     foreach my $pattern (keys %classMap) {
@@ -495,6 +496,7 @@ sub handleTagCloud {
       }
     }
 
+    push @terms, $term;
     $termCount{$term}+=$weight;
   }
   
@@ -502,10 +504,7 @@ sub handleTagCloud {
   my $floor = -1;
   my $ceiling = 0;
   my %origTermCount = %termCount;
-  foreach my $term (keys %termCount) {
-
-    # normalization
-    $termCount{$term} = log($termCount{$term}) if $theNormalize == NORMALIZE_LOG;
+  foreach my $term (@terms) {
 
     # truncation
     if ($termCount{$term} < $theMin) {
@@ -513,12 +512,18 @@ sub handleTagCloud {
       next;
     }
 
+    # normalization
+    $termCount{$term} = log($termCount{$term}) if $theNormalize == NORMALIZE_LOG;
+
     $ceiling = $termCount{$term}
       if $termCount{$term} > $ceiling;
     $floor = $termCount{$term}
       if $termCount{$term} < $floor || $floor < 0;
   }
-  unless (scalar(keys %termCount)) {
+  my @tmp = map {defined($termCount{$_})?$_:()} @terms;
+  @terms = @tmp;
+  
+  unless (scalar(@terms)) {
     return '<span class="foswikiAlert">nothing found</span>' if $theWarn eq 'on';
     return '';
   }
@@ -532,31 +537,32 @@ sub handleTagCloud {
     $incr = 1;
   }
   my %termWeight;
-  foreach my $term (keys %termCount) {
+  foreach my $term (@terms) {
     $termWeight{$term} = int(($termCount{$term} - $floor + 0.0) / $incr) + 1;
   }
 
   # sort keys
-  my @sortedTerms;
-  if ($theSort eq 'alpha') {
-    @sortedTerms = sort {lc($a) cmp lc($b)} keys %termCount;
+  if ($theSort eq 'off') {
+    # nop
+  } elsif ($theSort eq 'alpha') {
+    @terms = sort {lc($a) cmp lc($b)} keys %termCount;
   } elsif ($theSort eq 'case') {
-    @sortedTerms = sort keys %termCount;
+    @terms = sort keys %termCount;
   } else {
     if ($theSort eq 'count') {
-      @sortedTerms = sort {($termCount{$b} <=> $termCount{$a}) || ($a cmp $b)} keys %termCount;
+      @terms = sort {($termCount{$b} <=> $termCount{$a}) || ($a cmp $b)} keys %termCount;
     } else {
-      @sortedTerms = sort {($termWeight{$b} <=> $termWeight{$a}) || ($a cmp $b)} keys %termCount;
+      @terms = sort {($termWeight{$b} <=> $termWeight{$a}) || ($a cmp $b)} keys %termCount;
     }
   }
-  @sortedTerms = reverse @sortedTerms if $theReverse eq 'on';
+  @terms = reverse @terms if $theReverse eq 'on';
 
   # format result
   my $result = '';
 
   my $index = 0;
   my $lastGroup = '';
-  foreach my $term (@sortedTerms) {
+  foreach my $term (@terms) {
     $index++;
     last if $theLimit && $index > $theLimit;
     my $text;
@@ -567,10 +573,10 @@ sub handleTagCloud {
       $text .= $theFormat;
     } else {
       if ($theSort eq 'alpha') {
-	$group = substr($term, 0, 1);
+	$group = unicode_substr($term, 0, 1);
 	$group = ($theLowerCase eq 'on')?lc($group):uc($group);
       } elsif ($theSort eq 'case') {
-	$group = substr($term, 0, 1);
+	$group = unicode_substr($term, 0, 1);
       } else {
 	$group = int($weight/10)*10;
       }
@@ -638,16 +644,20 @@ sub handleFadeRGB {
 ###############################################################################
 # from Foswiki::Plurals
 sub singularForm {
-  my $singularForm = shift;
-  
-  $singularForm =~ s/ies$/y/;      # plurals like policy / policies
-  $singularForm =~ s/sses$/ss/;    # plurals like address / addresses
-  $singularForm =~ s/ches$/ch/;    # plurals like search / searches
-  $singularForm =~ s/(oes|os)$/o/; # plurals like veto / vetoes
-  $singularForm =~ s/([Xx])es$/$1/;# plurals like box / boxes
-  $singularForm =~ s/([^s])s$/$1/; # others, excluding ss like address(es)
+  my $string = shift;
 
-  return $singularForm
+  my $charset = $Foswiki::cfg{Site}{CharSet};
+  
+  $string = Encode::decode($charset, $string);
+  $string =~ s/ies$/y/;      # plurals like policy / policies
+  $string =~ s/sses$/ss/;    # plurals like address / addresses
+  $string =~ s/ches$/ch/;    # plurals like search / searches
+  $string =~ s/(oes|os)$/o/; # plurals like veto / vetoes
+  $string =~ s/([Xx])es$/$1/;# plurals like box / boxes
+  $string =~ s/([^s])s$/$1/; # others, excluding ss like address(es)
+  $string = Encode::encode($charset, $string);
+
+  return $string
 }
 
 ###############################################################################
@@ -662,6 +672,19 @@ sub getStopWords {
   }
 
   return $pattern;
+}
+
+################################################################################
+sub unicode_substr {
+  my ($string, $offset, $length) = @_;
+
+  my $charset = $Foswiki::cfg{Site}{CharSet};
+
+  $string = Encode::decode($charset, $string);
+  $string = substr($string, $offset, $length);
+  $string = Encode::encode($charset, $string);
+
+  return $string;
 }
 
 ###############################################################################

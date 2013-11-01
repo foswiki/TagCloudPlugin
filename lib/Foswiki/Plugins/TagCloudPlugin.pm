@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2009 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2013 Michael Daum http://michaeldaumconsulting.com
 #
 # Additional copyrights apply to some or all of the code in this
 # file as follows:
@@ -18,15 +18,14 @@
 package Foswiki::Plugins::TagCloudPlugin;
 
 use strict;
-use vars qw(
-  $VERSION $RELEASE $SHORTDESCRIPTION $NO_PREFS_IN_TOPIC 
-  $isInitialized
-);
+use warnings;
 
-$VERSION = '$Rev$';
-$RELEASE = '2.21';
-$NO_PREFS_IN_TOPIC = 1;
-$SHORTDESCRIPTION = 'Renders a tag cloud given a list of terms';
+our $VERSION = '3.00';
+our $RELEASE = '3.00';
+our $NO_PREFS_IN_TOPIC = 1;
+our $SHORTDESCRIPTION = 'Renders a tag cloud given a list of terms';
+
+our $isInitialized;
 
 ###############################################################################
 sub initPlugin {
