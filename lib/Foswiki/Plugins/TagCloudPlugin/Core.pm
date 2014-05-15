@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2013 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2014 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@ package Foswiki::Plugins::TagCloudPlugin::Core;
 use strict;
 use warnings;
 
-use constant DEBUG => 0; # toggle me
+use constant TRACE => 0; # toggle me
 
 our %stopWords = (
   en => {
@@ -355,7 +355,7 @@ use constant NORMALIZE_LOG => 1;
 
 ###############################################################################
 sub writeDebug {
-  print STDERR '- TagCloudPlugin - '.$_[0]."\n" if DEBUG;
+  print STDERR '- TagCloudPlugin - '.$_[0]."\n" if TRACE;
 }
 
 ###############################################################################
@@ -504,16 +504,16 @@ sub handleTagCloud {
   my $floor = -1;
   my $ceiling = 0;
   my %origTermCount = %termCount;
-  foreach my $term (@terms) {
 
+  foreach my $term (@terms) {
     # truncation
-    if ($termCount{$term} < $theMin) {
+    if ($origTermCount{$term} < $theMin) {
       delete $termCount{$term};
       next;
     }
 
     # normalization
-    $termCount{$term} = log($termCount{$term}) if $theNormalize == NORMALIZE_LOG;
+    $termCount{$term} = log($origTermCount{$term}) if $theNormalize == NORMALIZE_LOG;
 
     $ceiling = $termCount{$term}
       if $termCount{$term} > $ceiling;
