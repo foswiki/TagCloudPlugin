@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2014 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2016 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -573,10 +573,10 @@ sub handleTagCloud {
       $text .= $theFormat;
     } else {
       if ($theSort eq 'alpha') {
-	$group = unicode_substr($term, 0, 1);
+	$group = substr($term, 0, 1);
 	$group = ($theLowerCase eq 'on')?lc($group):uc($group);
       } elsif ($theSort eq 'case') {
-	$group = unicode_substr($term, 0, 1);
+	$group = substr($term, 0, 1);
       } else {
 	$group = int($weight/10)*10;
       }
@@ -674,18 +674,4 @@ sub getStopWords {
   return $pattern;
 }
 
-################################################################################
-sub unicode_substr {
-  my ($string, $offset, $length) = @_;
-
-  my $charset = $Foswiki::cfg{Site}{CharSet};
-
-  $string = Encode::decode($charset, $string);
-  $string = substr($string, $offset, $length);
-  $string = Encode::encode($charset, $string);
-
-  return $string;
-}
-
-###############################################################################
 1;

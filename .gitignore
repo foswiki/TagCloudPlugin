@@ -1,0 +1,11 @@
+igp_*
+*.swp
+*.gz
+*,v
+/TagCloudPlugin.md5
+/TagCloudPlugin.sha1
+/TagCloudPlugin.tgz
+/TagCloudPlugin.txt
+/TagCloudPlugin.zip
+/TagCloudPlugin_installer
+/TagCloudPlugin_installer.pl

@@ -1,8 +1,10 @@
 %META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1400154695" format="1.1" reprev="4" version="4"}%
 ---+!! <nop>%TOPIC%
-%TOC%
-%STARTSECTION{"exampletext"}%
+%FORMFIELD{"Description"}%
 
+%TOC%
+
+%STARTSECTION{"exampletext"}%
 ---++ Description
 This plugin helps rendering tag clouds.
 From Wikipedia:Tag_cloud
@@ -168,21 +170,12 @@ Cloud for the above text:
 }%
 </div>
 
----++ Plugin Installation Instructions
+---++ Installation Instructions
 %$INSTALL_INSTRUCTIONS%
 
----++ Plugin Info
-
-<!-- provided for compatibility only
-   * Set SHORTDESCRIPTION = Renders a tag cloud given a list of terms
--->
-
-|  Plugin Author: | Michael Daum |
-|  Copyright &copy;: | 2006-2014, Michael Daum http://michaeldaumconsulting.com |
-|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Release: | %$RELEASE% |
-|  Version: | %$VERSION% |
-|  Change History: | &nbsp; |
+---++ Change History
+%TABLE{columnwidths="7em" tablewidth="100%"}%
+|  01 Apr 2016: | reverted old unicode fix no longer appropriate since Foswiki-2 |
 |  15 May 2014: | fixed filtering terms |
 |  01 Nov 2013: | preserve sorting order of terms; \
                   fixed normalization to respect the =min= parameter; \
@@ -214,8 +207,15 @@ Cloud for the above text:
                   reworked order of tokenization. \
                   added fadeRGB format string variable |
 |  24 Feb 2006: | Initial version |
-|  Perl Version: | 5.8 |
-|  Plugin Home: | Foswiki:Extensions/%TOPIC% |
-|  Support: | Foswiki:Support/%TOPIC% |
 
 %META:FILEATTACHMENT{name="TagCloud.jpg" attachment="TagCloud.jpg" attr="" comment="" date="1141219293" path="TagCloud.jpg" size="22049" stream="TagCloud.jpg" user="ProjectContributor" version="1"}%
+%META:FORM{name="PackageForm"}%
+%META:FIELD{name="Author" title="Author" value="Michael Daum"}%
+%META:FIELD{name="Copyright" title="Copyright" value="2006-2016, Michael Daum http://michaeldaumconsulting.com"}%
+%META:FIELD{name="Description" title="Description" value="%25$SHORTDESCRIPTION%25"}%
+%META:FIELD{name="Home" title="Home" value="Foswiki:Extensions/%TOPIC%"}%
+%META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
+%META:FIELD{name="Release" title="Release" value="%$RELEASE%"}%
+%META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%TOPIC%"}%
+%META:FIELD{name="Support" title="Support" value="Foswiki:Support/%TOPIC%"}%
+%META:FIELD{name="Version" title="Version" value="%$VERSION%"}%
