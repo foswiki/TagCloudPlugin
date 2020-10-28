@@ -1,3 +1,4 @@
+!noci
 data/System/TagCloudPlugin.txt 0644
 lib/Foswiki/Plugins/TagCloudPlugin/Core.pm 0644
 lib/Foswiki/Plugins/TagCloudPlugin.pm 0644

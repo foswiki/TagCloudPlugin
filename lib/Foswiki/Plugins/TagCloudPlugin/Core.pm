@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2016 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2020 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -396,11 +396,11 @@ sub handleTagCloud {
   $theFooter ||= '';
 
   # fix params
-  $theMin =~ s/[^\d]//go;
+  $theMin =~ s/[^\d]//g;
   $theMin = 1 unless defined $theMin;
-  $theBuckets =~ s/[^\d]//go;
+  $theBuckets =~ s/[^\d]//g;
   $theBuckets = 10 if !$theBuckets || $theBuckets < 2;
-  $theOffset =~ s/[^\d]//go;
+  $theOffset =~ s/[^\d]//g;
   $theOffset = 10 unless defined $theOffset;
   $theSort = 'alpha' unless $theSort =~ /^(alpha|case|weight|count)$/;
   $theReverse = 'off' unless $theReverse =~ /^(on|off)$/;
@@ -430,7 +430,7 @@ sub handleTagCloud {
   # generate term list
   if (expandVariables($theTerms)) {
     #writeDebug("initially theTerms=$theTerms\n");
-    $theTerms = Foswiki::Func::expandCommonVariables($theTerms, $theTopic, $theWeb);
+    $theTerms = Foswiki::Func::expandCommonVariables($theTerms, $theTopic, $theWeb) if $theTerms =~ /%/;
   }
 
   # count terms
@@ -445,14 +445,14 @@ sub handleTagCloud {
   if ($theFilter eq 'off') {
     # nop
   } elsif ($theFilter eq 'on') {
-    $theTerms =~ s/<[^>]+>/ /go;
-    $theTerms =~ s/%[A-Z]+%/ /go;
+    $theTerms =~ s/<[^>]+>/ /g;
+    $theTerms =~ s/%[A-Z]+%/ /g;
     $theTerms =~ s/<\!\-\-.*?\-\->/ /gs;
-    $theTerms =~ s/\&[a-z]+;/ /go;
-    $theTerms =~ s/\&#[0-9]+;/ /go;
-    $theTerms =~ s/[\*\.=\[\]\(\);&#\\\/\~\-\+`!}{"\$\>\<_]/ /go;
-    $theTerms =~ s/[:<>%]//go;
-    $theTerms =~ s/\d//go;
+    $theTerms =~ s/\&[a-z]+;/ /g;
+    $theTerms =~ s/\&#[0-9]+;/ /g;
+    $theTerms =~ s/[\*\.=\[\]\(\);&#\\\/\~\-\+`!}{"\$\>\<_]/ /g;
+    $theTerms =~ s/[:<>%]//g;
+    $theTerms =~ s/\d//g;
   } else {
     $theTerms =~ s/$theFilter/ /g;
   }
@@ -621,10 +621,10 @@ sub expandVariables {
       $found = 1;
     }
   }
-  $found = 1 if $_[0] =~ s/\$percnt/\%/go;
+  $found = 1 if $_[0] =~ s/\$percnt/\%/g;
   $found = 1 if $_[0] =~ s/\$nop//g;
-  $found = 1 if $_[0] =~ s/\$n/\n/go;
-  $found = 1 if $_[0] =~ s/\$dollar/\$/go;
+  $found = 1 if $_[0] =~ s/\$n/\n/g;
+  $found = 1 if $_[0] =~ s/\$dollar/\$/g;
 
   return $found;
 }
